@@ -1,4 +1,4 @@
-package com.mallquidev.expense_tracker_api.service;
+    package com.mallquidev.expense_tracker_api.service;
 
 import com.mallquidev.expense_tracker_api.dto.AuthResponse;
 import com.mallquidev.expense_tracker_api.dto.LoginRequest;
@@ -17,11 +17,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthService {
     //10
-    private final UserService userService;
-    private final RoleRepository roleRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final JwtUtil jwtUtil;
-    private final AuthenticationManager authenticationManager;
+    //13
+    private final UserService userService;//para buscar, registrar y verificar usuarios
+    private final RoleRepository roleRepository;//para buscar roles desde la base de datos
+    private final PasswordEncoder passwordEncoder;//para encripar la nueva contrasena del nuevo usuario
+    private final JwtUtil jwtUtil;//para generar el token
+    private final AuthenticationManager authenticationManager;//para autenticar usuarios (login y despues del registro)
 
     public AuthService(UserService userService, RoleRepository roleRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil, AuthenticationManager authenticationManager) {
         this.userService = userService;
@@ -31,55 +32,52 @@ public class AuthService {
         this.authenticationManager = authenticationManager;
     }
 
+    //login
     public AuthResponse authenticate(LoginRequest request) {
-        //autenticar el usuario
+        //Autenticamos al usuario con spring security usando su username y password
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getUserName(), request.getPassword())
         );
 
-        //Guardar la autentication en el contexto de seguridad
+        //guardamos esa autenticacion en el contexto de seguridad de spring (para futuras validaciones)
         SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        //obtenemos usuarios desde la bd
-        User user = userService.findByName(request.getUserName());
-
-        //generamos el token
+        //buscamos al usuario desde la bd (para extraer datos como nombre y rol)
+        User user = userService.findByUserName(request.getUserName());
+        //generamos un token JWT valido para el usuario autenticado
         String token = jwtUtil.generateToken(authentication);
-
+        //retornamos una respuesta con el token y algunos datos del usuario
         return new AuthResponse(token, user.getUserName(), user.getRole().getName());
     }
 
+    //register
     public AuthResponse registerUser(RegisterRequest request) {
-        //verificamos si el usuario ya exister
-        if(userService.existsByUsername(request.getUserName())) {
-            throw new RuntimeException("El usuario ya existe");
+        //verifica si el nombre de usuario ya existe
+        if (userService.existsByUserName(request.getUserName())){
+            throw new RuntimeException("Usuario ya existe");//Se usa if + throw porque existsByUserName() devuelve un boolean
         }
-
-        //Buscar el rol en la base de datos
+        //busca el rol USER desde la bd
         Role roleUser = roleRepository.findByName("USER")
-                .orElseThrow(() -> new RuntimeException("El ROL USER no existe"));
+                .orElseThrow(()-> new RuntimeException("Rol USER no encontrado"));//Se usa orElseThrow porque findByName() devuelve un Optional
 
-        //creare usuario con contrasena encriptada
-        User newUser = new User(
+        //crea el nuevo usuario, encriptando su contrasena
+        User user = new User(
                 request.getUserName(),
-                null,
                 passwordEncoder.encode(request.getPassword()),
                 roleUser
         );
-
-        //Registramos en la bd y con esto nada mas ya estaria solo si quieres autenticar o solo creas el
-        // token y retornamos datos
-        userService.save(newUser);
-
-        //generar el token JWT para el nuevo usuario
+        //guardar el nuevo usuario en la bd
+        userService.save(user);
+        //Autenticamos al nuevo usuario (como el login)
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getUserName(), request.getPassword())
         );
+        //Guardamos la autenticacion en el contexto de seguridad
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        //generar el token
+        //generamos token JWT para el nuevo usuario
         String token = jwtUtil.generateToken(authentication);
+        //retornamos una respuesta con el token y datos del usuario
+        return new AuthResponse(token, user.getUserName(), user.getRole().getName());
 
-        //6 retornar respuesta con token y datos basico
-        return  new AuthResponse(token, newUser.getUserName(), roleUser.getName());
     }
+
 }

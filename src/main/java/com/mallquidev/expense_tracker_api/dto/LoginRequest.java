@@ -7,6 +7,6 @@ import lombok.Setter;
 @Setter
 public class LoginRequest {
     //3
-    private String userName;
+    private String userName; //campos que el usuario debe enviar al iniciar session(login)
     private String password;
 }

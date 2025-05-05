@@ -33,9 +33,8 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Expense> expenses;
 
-    public User(String userName, String email, String password, Role role) {
+    public User(String userName, String password, Role role) {
         this.userName = userName;
-        this.email = email;
         this.password = password;
         this.role = role;
     }

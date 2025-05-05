@@ -1,9 +1,15 @@
 package com.mallquidev.expense_tracker_api.entities;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "expense")
 public class Expense {
@@ -26,63 +32,5 @@ public class Expense {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    public Expense() {
-    }
 
-    public Expense(Integer id, String productName, Integer quantity, LocalDateTime expenseDate, User user, Category category) {
-        this.id = id;
-        this.productName = productName;
-        this.quantity = quantity;
-        this.expenseDate = expenseDate;
-        this.user = user;
-        this.category = category;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getProductName() {
-        return productName;
-    }
-
-    public void setProductName(String productName) {
-        this.productName = productName;
-    }
-
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
-
-    public LocalDateTime getExpenseDate() {
-        return expenseDate;
-    }
-
-    public void setExpenseDate(LocalDateTime expenseDate) {
-        this.expenseDate = expenseDate;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public Category getCategory() {
-        return category;
-    }
-
-    public void setCategory(Category category) {
-        this.category = category;
-    }
 }

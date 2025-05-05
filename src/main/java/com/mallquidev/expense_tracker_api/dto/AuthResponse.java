@@ -6,7 +6,9 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class AuthResponse {
-    private String token;
-    private String userName;
-    private String role;
+    //10.1
+    //datos que le damos al frontend
+    private String token;//el token generado
+    private String userName;//el nombre de usuario
+    private String role;//el rol
 }

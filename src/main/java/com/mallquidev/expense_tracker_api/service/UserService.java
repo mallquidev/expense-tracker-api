@@ -1,4 +1,5 @@
 package com.mallquidev.expense_tracker_api.service;
+
 import com.mallquidev.expense_tracker_api.entities.User;
 import com.mallquidev.expense_tracker_api.repositories.UserRepository;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -12,16 +13,16 @@ import java.util.Collections;
 @Service
 public class UserService implements UserDetailsService {
     //5
-    private final UserRepository userRepository;
+    private UserRepository userRepository;
 
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
     @Override
-    public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException{
         User user = userRepository.findByUserName(userName)
-                .orElseThrow(() -> new UsernameNotFoundException("User Not Found"));
+                .orElseThrow(()-> new UsernameNotFoundException("User not found"));
 
         SimpleGrantedAuthority authority = new SimpleGrantedAuthority(user.getRole().getName());
 
@@ -32,17 +33,20 @@ public class UserService implements UserDetailsService {
         );
     }
 
-    //Buscar usuario
-    public User findByName(String userName) {
-        return userRepository.findByUserName(userName)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    //buscamos un usuario
+    public User findByUserName(String userName){
+        return  userRepository.findByUserName(userName)
+                .orElseThrow(()-> new UsernameNotFoundException("User not found"));
+
     }
 
-    public boolean existsByUsername(String userName) {
+    //existe el usuario?
+    public boolean existsByUserName(String userName){
         return userRepository.existsByUserName(userName);
     }
 
-    public void save(User user) {
+    //guardar
+    public void save(User user){
         userRepository.save(user);
     }
 
