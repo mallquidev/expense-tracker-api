@@ -61,6 +61,7 @@ public class AuthService {
 
         //crea el nuevo usuario, encriptando su contrasena
         User user = new User(
+
                 request.getUserName(),
                 passwordEncoder.encode(request.getPassword()),
                 roleUser

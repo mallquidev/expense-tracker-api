@@ -50,6 +50,17 @@ public class CategoryService {
         categoryRepository.deleteById(id);
     }
 
+    //update category
+    public CategoryDto updateCategory(Integer id, CategoryDto categoryDto) {
+        //verificamos si existe
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(()-> new IllegalStateException("Category does not exist"));
+
+        category.setName(categoryDto.getName());
+        Category savedCategory = categoryRepository.save(category);
+        return new CategoryDto(savedCategory.getId(), savedCategory.getName());
+    }
+
 
 
 }
